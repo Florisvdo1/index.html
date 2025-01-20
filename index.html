@@ -1,0 +1,469 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>oever.art - Refined Background Video</title>
+  <!-- Inline CSS -->
+  <style>
+    /* Global Resets */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    html, body {
+      width: 100%;
+      height: 100%;
+      font-family: Arial, sans-serif; /* Main body font */
+      background-color: #000; /* Fallback if video doesn't load */
+      color: #fff;
+      overflow-x: hidden;
+    }
+
+    /* 
+      VIDEO CONTAINER 
+      Houses both the video and the black overlay. 
+    */
+    #video-container {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: -1; /* Base layer for the video and overlay */
+      overflow: hidden;
+    }
+    /* BACKGROUND VIDEO */
+    #background-video {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover; /* Maintains aspect ratio and covers the viewport */
+      z-index: -1; /* Ensure it stays behind the overlay */
+    }
+    /* BLACK SEMI-TRANSPARENT OVERLAY (30% black) */
+    #black-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.3); /* 30% black, 70% transparent */
+      z-index: 1;      /* Above the video */
+      pointer-events: none; /* Don't block any clicks on content above */
+    }
+
+    /* MAIN CONTENT WRAPPER 
+       Ensures all page sections and elements appear above the overlay.
+    */
+    #main-content {
+      position: relative;
+      z-index: 2; /* Stacks all main content above #black-overlay */
+    }
+
+    /* HEADER & NAVIGATION */
+    header {
+      position: relative;
+      width: 100%;
+      background-color: rgba(0, 0, 0, 0.8);
+      padding: 1rem 2rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      z-index: 10; /* Even higher to ensure the header is always visible */
+    }
+    .brand {
+      font-family: "Playfair Display", serif; /* Luxury serif for branding */
+      font-size: 1.5rem;
+    }
+    nav ul {
+      display: flex;
+      gap: 1rem;
+      list-style: none;
+    }
+    nav a {
+      color: #fff;
+      text-decoration: none;
+      transition: color 0.3s ease;
+    }
+    nav a:hover {
+      color: #ffd700; /* Gold accent on hover */
+    }
+
+    /* SECTION STYLES */
+    section {
+      position: relative;
+      padding: 4rem 2rem;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    /* HERO SECTION */
+    .hero {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      height: 100vh; /* Occupies full viewport height for a bold intro */
+      text-align: center;
+    }
+    .hero h1 {
+      font-family: "Playfair Display", serif;
+      font-size: 3rem;
+      margin-bottom: 1rem;
+    }
+    .hero p {
+      font-size: 1.2rem;
+      margin-bottom: 2rem;
+      max-width: 600px;
+    }
+    .hero button {
+      background: #ffd700; /* Gold accent */
+      color: #000;
+      border: none;
+      padding: 0.75rem 1.5rem;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: transform 0.3s ease;
+    }
+    .hero button:hover {
+      transform: scale(1.05);
+    }
+
+    /* ABOUT SECTION */
+    .about h2 {
+      font-family: "Playfair Display", serif;
+      font-size: 2rem;
+      margin-bottom: 1rem;
+    }
+    .about p {
+      line-height: 1.6;
+      max-width: 700px;
+      margin-bottom: 1rem;
+    }
+
+    /* GALLERY SECTION */
+    .gallery-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 1rem;
+    }
+    .gallery-item {
+      position: relative;
+      overflow: hidden;
+      cursor: pointer;
+    }
+    .gallery-item img,
+    .gallery-item video {
+      width: 100%;
+      display: block;
+      transition: transform 0.3s ease;
+    }
+    .gallery-item:hover img,
+    .gallery-item:hover video {
+      transform: scale(1.05);
+    }
+
+    /* INQUIRY SECTION (Multi-Step Form) */
+    .inquiry h2 {
+      font-family: "Playfair Display", serif;
+      margin-bottom: 1rem;
+    }
+    .form-step {
+      display: none; /* Steps are hidden by default, toggled by JS */
+    }
+    .form-step.active {
+      display: block;
+    }
+    .form-nav {
+      margin-top: 1rem;
+    }
+    .form-nav button {
+      background: #ffd700;
+      color: #000;
+      border: none;
+      padding: 0.5rem 1rem;
+      margin: 0 0.5rem;
+      cursor: pointer;
+      transition: transform 0.2s ease;
+    }
+    .form-nav button:hover {
+      transform: scale(1.05);
+    }
+    .inquiry input,
+    .inquiry select,
+    .inquiry textarea {
+      width: 100%;
+      margin-bottom: 1rem;
+      padding: 0.5rem;
+      background-color: #111;
+      color: #fff;
+      border: 1px solid #555;
+    }
+
+    /* PARALLAX SECTION */
+    .parallax {
+      background: url('images1.jpg') center center / cover no-repeat fixed;
+      height: 50vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+    }
+    .parallax h3 {
+      font-family: "Playfair Display", serif;
+      font-size: 2rem;
+      background: rgba(0, 0, 0, 0.5);
+      padding: 1rem;
+    }
+
+    /* CONTACT SECTION */
+    #contact h2 {
+      font-family: "Playfair Display", serif;
+      margin-bottom: 1rem;
+    }
+
+    /* "REFINE" PROMPT */
+    .refine-block {
+      text-align: center;
+      font-size: 0.9rem;
+      color: #ccc;
+      margin-top: 2rem;
+    }
+
+    /* FOOTER */
+    footer {
+      text-align: center;
+      padding: 2rem;
+      background: rgba(0, 0, 0, 0.8);
+    }
+    footer p {
+      margin-bottom: 0.5rem;
+      font-size: 0.9rem;
+    }
+    .social-links {
+      margin-top: 0.5rem;
+    }
+    .social-links a {
+      margin: 0 0.5rem;
+      color: #fff;
+      text-decoration: none;
+      transition: color 0.3s ease;
+    }
+    .social-links a:hover {
+      color: #ffd700;
+    }
+
+    /* Responsive Tweaks */
+    @media (max-width: 768px) {
+      .hero h1 {
+        font-size: 2.2rem;
+      }
+      .hero p {
+        font-size: 1rem;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- 
+    VIDEO + BLACK OVERLAY LAYER 
+    The base layer for the background with a 30% black overlay on top.
+  -->
+  <div id="video-container">
+    <video id="background-video" autoplay muted loop playsinline>
+      <source src="background.mp4" type="video/mp4" />
+      Your browser does not support the video tag.
+    </video>
+    <div id="black-overlay"></div>
+  </div>
+
+  <!-- MAIN CONTENT WRAPPER (above the overlay) -->
+  <div id="main-content">
+    <!-- Header & Navigation -->
+    <header>
+      <div class="brand">oever.art</div>
+      <nav>
+        <ul>
+          <li><a href="#home">Home</a></li>
+          <li><a href="#gallery">Gallery</a></li>
+          <li><a href="#inquiries">Inquiries</a></li>
+          <li><a href="#contact">Contact</a></li>
+        </ul>
+      </nav>
+    </header>
+
+    <!-- Hero Section -->
+    <section id="home" class="hero">
+      <h1>Crown of Flowers Full BG</h1>
+      <p>Where nature meets fantasy—experience the extraordinary artwork of Floris van den Hoever.</p>
+      <button onclick="document.getElementById('about').scrollIntoView({behavior:'smooth'});">
+        Explore Collections
+      </button>
+    </section>
+
+    <!-- About Section -->
+    <section id="about" class="about">
+      <h2>About the Vision</h2>
+      <p>
+        Discover the story behind <strong>oever.art</strong>: a fusion of nature-fantasy aesthetics and 
+        modern digital mediums. Each piece reflects a dedication to exquisite detail, bridging imaginary 
+        worlds with real ones in a majestic dance of color and form.
+      </p>
+    </section>
+
+    <!-- Gallery Section -->
+    <section id="gallery">
+      <h2 style="font-family: 'Playfair Display', serif; text-align: center; margin-bottom: 2rem;">Gallery</h2>
+      <div class="gallery-grid">
+        <!-- Example video item (optional) -->
+        <div class="gallery-item">
+          <video src="crown_of_flowers.mp4" muted loop></video>
+        </div>
+        <!-- Placeholder images -->
+        <div class="gallery-item">
+          <img src="images1.jpg" alt="Gallery Item 1">
+        </div>
+        <div class="gallery-item">
+          <img src="images2.jpg" alt="Gallery Item 2">
+        </div>
+        <div class="gallery-item">
+          <img src="images3.jpg" alt="Gallery Item 3">
+        </div>
+        <div class="gallery-item">
+          <img src="images4.jpg" alt="Gallery Item 4">
+        </div>
+      </div>
+    </section>
+
+    <!-- Parallax Section -->
+    <section class="parallax">
+      <h3>Where Nature Meets Fantasy</h3>
+    </section>
+
+    <!-- Inquiries / Multi-Step Form Section -->
+    <section id="inquiries" class="inquiry">
+      <h2>Commission Your Own Artwork</h2>
+      <!-- STEP 1 -->
+      <div class="form-step active" data-step="1">
+        <p>Please enter your basic information:</p>
+        <input type="text" id="name" placeholder="Your Name" />
+        <input type="email" id="email" placeholder="Your Email" />
+        <div class="form-nav">
+          <button onclick="nextStep()">Next</button>
+        </div>
+      </div>
+      <!-- STEP 2 -->
+      <div class="form-step" data-step="2">
+        <p>Tell us about your preferences:</p>
+        <select id="style">
+          <option value="">-- Select a Style --</option>
+          <option value="Fantasy">Fantasy</option>
+          <option value="Surreal">Surreal</option>
+          <option value="Realistic">Realistic</option>
+        </select>
+        <textarea id="details" rows="4" placeholder="Additional details..."></textarea>
+        <div class="form-nav">
+          <button onclick="prevStep()">Back</button>
+          <button onclick="nextStep()">Next</button>
+        </div>
+      </div>
+      <!-- STEP 3 -->
+      <div class="form-step" data-step="3">
+        <p>Please confirm your information and submit:</p>
+        <div id="confirm-info" style="margin-bottom:1rem;"></div>
+        <div class="form-nav">
+          <button onclick="prevStep()">Back</button>
+          <button onclick="submitForm()">Submit</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- Contact Section -->
+    <section id="contact" style="text-align: center;">
+      <h2>Contact</h2>
+      <p>Reach out for collaborations, custom commissions, or general inquiries.</p>
+      <p>
+        Email: <a href="mailto:info@oever.art" style="color: #ffd700;">info@oever.art</a>
+      </p>
+    </section>
+
+    <!-- "Refine This Website Further" Prompt -->
+    <div class="refine-block">
+      <p>
+        Refine This Website Further: Keep everything in one single <strong>index.html</strong> file for streamlined updates.
+      </p>
+    </div>
+
+    <!-- Footer -->
+    <footer>
+      <p>© 2025 oever.art - All Rights Reserved</p>
+      <div class="social-links">
+        <a href="#!" target="_blank">Instagram</a>
+        <a href="#!" target="_blank">Facebook</a>
+        <a href="#!" target="_blank">TikTok</a>
+      </div>
+    </footer>
+  </div>
+
+  <!-- Inline JavaScript -->
+  <script>
+    /* Multi-Step Form Logic */
+    let currentStep = 1;
+
+    function nextStep() {
+      const currentFormStep = document.querySelector('.form-step[data-step="' + currentStep + '"]');
+      currentFormStep.classList.remove('active');
+      currentStep++;
+      const nextFormStep = document.querySelector('.form-step[data-step="' + currentStep + '"]');
+      if (nextFormStep) {
+        nextFormStep.classList.add('active');
+      }
+      updateConfirmation();
+    }
+
+    function prevStep() {
+      const currentFormStep = document.querySelector('.form-step[data-step="' + currentStep + '"]');
+      currentFormStep.classList.remove('active');
+      currentStep--;
+      const prevFormStep = document.querySelector('.form-step[data-step="' + currentStep + '"]');
+      if (prevFormStep) {
+        prevFormStep.classList.add('active');
+      }
+      updateConfirmation();
+    }
+
+    function updateConfirmation() {
+      if (currentStep === 3) {
+        const name = document.getElementById('name').value || 'N/A';
+        const email = document.getElementById('email').value || 'N/A';
+        const style = document.getElementById('style').value || 'N/A';
+        const details = document.getElementById('details').value || 'N/A';
+        document.getElementById('confirm-info').innerHTML = `
+          <strong>Name:</strong> ${name}<br/>
+          <strong>Email:</strong> ${email}<br/>
+          <strong>Style Preference:</strong> ${style}<br/>
+          <strong>Additional Details:</strong> ${details}
+        `;
+      }
+    }
+
+    function submitForm() {
+      alert('Thank you! Your inquiry has been submitted.');
+      // Reset form data
+      document.getElementById('name').value = '';
+      document.getElementById('email').value = '';
+      document.getElementById('style').selectedIndex = 0;
+      document.getElementById('details').value = '';
+      // Return to step 1
+      document.querySelector('.form-step[data-step="3"]').classList.remove('active');
+      currentStep = 1;
+      document.querySelector('.form-step[data-step="1"]').classList.add('active');
+    }
+  </script>
+</body>
+</html>
